@@ -17,7 +17,7 @@ void loop() {
   voltage = sensor_reading*(5.0/16382.0); //from 5V rail
   pressure = (voltage/5.0-0.1)/0.6667; //from datasheet in MPa
 
-  Serial.print("Pressure (MPa): ");
+  //Serial.print("Pressure (MPa): ");
   Serial.println(pressure);
   delay(100); //for readability
 }

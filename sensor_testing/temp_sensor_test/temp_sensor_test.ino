@@ -19,7 +19,7 @@ void loop() {
   R = 16382.0/sensor_reading-1; // sensor resistance using 14 bit measurement
   temp = 1.0/(log(R)/B+1/298.15)-273.15; // convert to temperature
 
-  Serial.print("Temperature (C): "); //report temp
+  //Serial.print("Temperature (C): "); //report temp
   Serial.println(temp);
   delay(100); //for readability
 }
