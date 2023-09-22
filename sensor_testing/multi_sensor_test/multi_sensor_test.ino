@@ -1,5 +1,9 @@
 //reads from multiple sensors and prints readings to terminal
 
+//time setup
+float time;
+int index;
+
 //pressure sensor setup
 int PRESSURE_SENSOR_PIN = A1;
 int pressure_sensor_reading;
@@ -18,6 +22,7 @@ void setup() {
   // put your setup code here, to run once:
   analogReadResolution(14); //change to 14-bit resolution
   long baudRate = 9600;
+  index = 0;
   Serial.begin(baudRate);
   Serial.print("Pressure (MPa)"); //pressure first
   Serial.print(",");
@@ -38,7 +43,11 @@ void loop() {
   R = 16382.0/temp_sensor_reading-1; // sensor resistance using 14 bit measurement
   temp = 1.0/(log(R)/B+1/298.15)-273.15; // convert to temperature
 
+  // calculate time
+  time = index*0.1; //in seconds, currently takes measurement every 100ms
+  index = index+1; //iterate each loop
+
   //print to Serial
-  Serial.print(pressure); Serial.print(","); Serial.println(temp);
+  Serial.print(time); Serial.print(","); Serial.print(pressure); Serial.print(","); Serial.println(temp);
   delay(100); //for readability
 }
