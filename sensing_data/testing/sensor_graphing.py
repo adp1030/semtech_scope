@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 sensor_data = pd.read_csv('test_multi_data_2.csv')
 
 # graph pressure
-sensor_data.plot(x='time', y='pressure', label='Pressure (MPa)')
+sensor_data.plot(x='time', y='pressure', label='Pressure (psi)')
 plt.xlabel("Time (s)")
 plt.ylabel("Pressure (MPa)")
 plt.title("Pipe Pressure Sensor Data")

@@ -28,7 +28,7 @@ void setup() {
   long baudRate = 9600;
   index = 0;
   Serial.begin(baudRate);
-  Serial.print("Pressure (MPa)"); //pressure first
+  Serial.print("Pressure (psi)"); //pressure first
   Serial.print(",");
   Serial.println("Temperature (C)");
   
@@ -45,7 +45,7 @@ void loop() {
 
   // pressure conversion
   voltage = pressure_sensor_reading*(5.0/16382.0); //from 5V rail
-  pressure = (voltage/5.0-0.1)/0.6667; //from datasheet in MPa
+  pressure = (((voltage/5.0-0.1)/0.6667))*145.038; //from datasheet in MPa, then convert to psi
 
   // temperature conversion
   R = 16382.0/temp_sensor_reading-1; // sensor resistance using 14 bit measurement
@@ -56,14 +56,18 @@ void loop() {
   index = index+1; //iterate each loop
 
   //display on LCD
-  lcd.print("Pres (MPa): ");
-  lcd.print(pressure);
-  lcd.setCursor(0,1); //change lines
-  lcd.print("Temp (C): ");
-  lcd.print(temp);
-  lcd.print("     ");
+  if (index % 5 == 0) //update display every 0.5 seconds
+  {
+    lcd.setCursor(0,0);
+    lcd.print("P (psi): ");
+    lcd.print(pressure, 3);
+    lcd.setCursor(0,1); //change lines
+    lcd.print("T (C): ");
+    lcd.print(temp, 3);
+    lcd.print("     ");
+  }
 
   //print to Serial
-  Serial.print(time); Serial.print(","); Serial.print(pressure); Serial.print(","); Serial.println(temp);
+  Serial.print(time); Serial.print(","); Serial.print(pressure,3); Serial.print(","); Serial.println(temp,3);
   delay(100); //for readability
 }
