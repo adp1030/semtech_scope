@@ -42,7 +42,7 @@ if __name__ == "__main__":
     fname = get_log_filename()
 
     with open(fname, 'a') as f:
-        f.write('Timestamp,A0,A1,A2,A3,A4,A5')
+        f.write('Timestamp,A0,A1,A2,A3,A4,A5\n')
 
     # Find Arduino and establish a connection
     arduino_serial = find_arduino_port()
@@ -58,7 +58,7 @@ if __name__ == "__main__":
                     print(f"Received data: {data}")
 
                     timestamp = datetime.now().strftime("%Y_%m_%d_t%H_%M_%S")
-                    data_to_write = f"{timestamp},{data}"
+                    data_to_write = f"{timestamp},{data}\n"
                     with open(fname, 'a') as f:
                         f.write(data_to_write)
 
