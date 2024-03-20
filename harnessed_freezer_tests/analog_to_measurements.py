@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from pressure_transduce.pressure_sensor import PressureSensor
 from thermistor_inline_transduce.inline_thermistor import InlineThermistor
@@ -35,42 +37,57 @@ def transduce_raw_data(csv_filename):
 
     df['Temp inline OUT [C]'] = df['Temp inline OUT [C]'].where((df['Temp inline OUT [C]'] > -50), other=pd.NA)
 
-    return df
+    columns_to_exclude = [f'A{i}' for i in range(6)]
+
+    # Create a new DataFrame without the specified columns
+    new_df = df.drop(columns=columns_to_exclude)
+
+    return new_df
 
 
-def plot_data(df):
+def plot_data_plotly(df):
 
-    #df = df[0:1000]
     # Create subplots
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+    fig = go.Figure()
+
+    # Create figure with subplots & shared x-axes
+    fig = make_subplots(rows=2, cols=1, vertical_spacing=0.05, shared_xaxes=True,)
 
     # Plot temperature
-    ax1.plot(df['Timestamp'], df['Temp surface Z.1 [C]'], label='Zone 1 surface')
-    ax1.plot(df['Timestamp'], df['Temp inline Z.1 [C]'],  label='Zone 1 inline')
-    ax1.plot(df['Timestamp'], df['Temp surface Z.3 [C]'], label='Zone 3 surface')
-    ax1.plot(df['Timestamp'], df['Temp inline OUT [C]'],  label='OUT inline')
-    ax1.set_ylabel('Temperature [C]')
-    ax1.legend()
+    fig.add_trace(go.Scatter(x=df['Timestamp'], y=df['Temp surface Z.1 [C]'], mode='lines', name='Zone 1 surface'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df['Timestamp'], y=df['Temp inline Z.1 [C]'],  mode='lines', name='Zone 1 inline'),  row=1, col=1)
+    fig.add_trace(go.Scatter(x=df['Timestamp'], y=df['Temp surface Z.3 [C]'], mode='lines', name='Zone 3 surface'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df['Timestamp'], y=df['Temp inline OUT [C]'],  mode='lines', name='OUT inline'),     row=1, col=1)
+    fig.update_yaxes(title_text="Temperature [C]", range=[-30, 30], row=1, col=1)
 
     # Plot pressure
-    ax2.plot(df['Timestamp'], df['Pressure Z.2 [psi]'],  label='Zone 2')
-    ax2.plot(df['Timestamp'], df['Pressure OUT [psi]'],  label='OUT')
-    ax2.set_ylabel('Pressure [psi]')
-    ax2.set_xlabel('Timestamp')
-    ax2.legend()
+    fig.add_trace(go.Scatter(x=df['Timestamp'], y=df['Pressure Z.2 [psi]'], mode='lines', name='Zone 2'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=df['Timestamp'], y=df['Pressure OUT [psi]'], mode='lines', name='OUT'),    row=2, col=1)
+    fig.update_yaxes(title_text="Pressure [psi]", row=2, col=1)
 
-    plt.suptitle('Temperature and Pressure Time Series')
-    plt.tight_layout()
-    plt.show()
+    # Set layout
+    fig.update_layout(
+        template="none",   #  "plotly", "plotly_white", "plotly_dark", "ggplot2", "seaborn", "simple_white", "none"
+        title='Temperature and Pressure Time Series',
+        showlegend=True
+    )
+
+    # Show the plot
+    fig.show()
+
 
 
 if __name__ == '__main__':
 
-    df = transduce_raw_data('Data_2024_02_21_t09_30_55_fixed.csv')
-    #df = transduce_raw_data('Data_2024_02_15_t10_08_45.csv')
-    #df = pd.read_csv('Transduced_data.csv')
+    fname_raw = None #"data/Data_2024_02_21_t09_30_55.csv"
+    fname_con = "data/Transduced_data_03_06.csv"
 
-    print(df)
-    plot_data(df)
+    if fname_raw is not None:
+        df = transduce_raw_data(fname_raw)
+        df.to_csv(fname_con, float_format='%.3f', index=False)
 
-    df.to_csv('Transduced_data_drip_test.csv', index=False)
+    df_transduced = pd.read_csv(fname_con)
+
+    print(df_transduced)
+    plot_data_plotly(df_transduced)
+
